@@ -24,7 +24,7 @@
       flex-direction: column;
       align-items: center;
       min-height: 100vh;
-      opacity: 1; /* visível por padrão para evitar "tudo invisível" */
+      opacity: 1;
       transition: opacity 0.9s ease;
     }
 
@@ -76,13 +76,6 @@
       z-index: 10;
     }
 
-    .controls {
-      display:flex;
-      gap:12px;
-      align-items:center;
-      margin-top:18px;
-    }
-
     button {
       margin-top: 20px;
       padding: 14px 32px;
@@ -96,11 +89,13 @@
       box-shadow: 0 4px 10px rgba(0,0,0,0.18);
       transition: transform .12s ease, background .15s ease;
     }
+
     button:active { transform: translateY(1px) scale(.997); }
     button:hover { background: #15491a; }
 
     .share-box {
-      margin-top: 20px;
+      margin-top: 30px;
+      margin-bottom: 30px;
       padding: 14px;
       border-radius: 10px;
       background: #fff;
@@ -210,7 +205,6 @@
       transform: scale(1.08);
     }
 
-    /* SweetAlert estilizado */
     .swal-popup {
       border-radius: 18px !important;
       box-shadow: 0 10px 40px rgba(0,0,0,0.28) !important;
@@ -218,23 +212,6 @@
       background: linear-gradient(145deg, #ffffff, #f8f8f9);
     }
 
-    .swal-title {
-      color: var(--accent) !important;
-      font-weight: 800 !important;
-      font-size: 22px !important;
-    }
-
-    .swal-confirm {
-      font-size: 18px !important;
-      font-weight: 700 !important;
-      padding: 12px 30px !important;
-      border-radius: 10px !important;
-      background: linear-gradient(90deg, var(--green-500), var(--accent)) !important;
-      box-shadow: 0 6px 18px rgba(0,0,0,0.14) !important;
-      color:#fff !important;
-    }
-
-    /* Responsivo rápido */
     @media (max-width:480px) {
       .wheel-container { width: 300px; height: 300px; }
       canvas { width:100%; height:100% }
@@ -253,14 +230,8 @@
     </div>
   </div>
 
-  <div class="controls">
-    <button onclick="spin()">🎯 GIRAR AGORA</button>
-    <a id="whatsapp-link" class="whatsapp-btn" href="#" target="_blank">🔗 Compartilhar</a>
-  </div>
-
-  <div class="share-box">
-    <p>📢 Compartilhe com amigos e ganhe até <strong>2.000MT</strong> em bônus!</p>
-  </div>
+  <!-- BOTÃO DE GIRAR CENTRALIZADO -->
+  <button onclick="spin()">🎯 GIRAR AGORA</button>
 
   <div class="testimonials">
     <h3>📢 Ganhos Reais de Moçambique</h3>
@@ -288,7 +259,12 @@
     </div>
   </div>
 
-  <!-- Botão flutuante do grupo WhatsApp -->
+  <!-- BOTÃO DE COMPARTILHAR NO FINAL -->
+  <div class="share-box">
+    <p>📢 Compartilhe com amigos e ganhe até <strong>2.000MT</strong> em bônus garantido!</p>
+    <a id="whatsapp-link" class="whatsapp-btn" href="#" target="_blank">🔗 Compartilhar no WhatsApp</a>
+  </div>
+
   <a href="https://whapro.pro/s/roleta"
      class="floating-whatsapp"
      target="_blank"
@@ -297,41 +273,34 @@
   </a>
 
   <script>
-    // --- Elementos e dados ---
     const canvas = document.getElementById("canvas");
     const ctx = canvas.getContext("2d");
     const wheel = document.getElementById("wheel");
-
     const prizes = [0, 100, 500, 1000, 2000, 10000, 0, 50];
     const colors = ["#F44336", "#4CAF50", "#FFC107", "#2196F3", "#9C27B0", "#009688", "#FF5722", "#3F51B5"];
     const total = prizes.length;
     const angle = 360 / total;
     let isSpinning = false;
 
-    // Áudios (note: serão reproduzidos apenas após interação do utilizador em muitos navegadores)
     const audioSpin = new Audio("https://cdn.pixabay.com/download/audio/2022/03/16/audio_497e4b496a.mp3");
     const audioWin = new Audio("https://cdn.pixabay.com/download/audio/2022/03/16/audio_e7c1ee0dc8.mp3");
     const audioLose = new Audio("https://cdn.pixabay.com/download/audio/2022/03/16/audio_63c65a48f4.mp3");
 
-    // link de partilha dinâmico
     const currentUrl = encodeURIComponent(window.location.href);
-    const whatsappShare = document.getElementById("whatsapp-link");
-    whatsappShare.href = `https://wa.me/?text=🎯%20Jogue%20a%20Roleta%20da%20Sorte%20e%20ganhe%20dinheiro%20real!%20Tente%20aqui:%20${currentUrl}`;
+    document.getElementById("whatsapp-link").href =
+      `https://wa.me/?text=🎯%20Jogue%20a%20Roleta%20da%20Sorte%20e%20ganhe%20dinheiro%20real!%20Tente%20aqui:%20${currentUrl}`;
 
-    // --- Desenha a roleta ---
     function drawWheel() {
       ctx.clearRect(0,0,canvas.width,canvas.height);
       for (let i = 0; i < total; i++) {
         const startAngle = (angle * i) * Math.PI / 180;
         const endAngle = (angle * (i + 1)) * Math.PI / 180;
-
         ctx.beginPath();
         ctx.moveTo(170, 170);
         ctx.arc(170, 170, 160, startAngle, endAngle);
         ctx.fillStyle = colors[i];
         ctx.fill();
         ctx.save();
-
         ctx.translate(170, 170);
         ctx.rotate(startAngle + (endAngle - startAngle) / 2);
         ctx.textAlign = "right";
@@ -341,17 +310,12 @@
         ctx.restore();
       }
     }
-
     drawWheel();
 
-    // --- Função de giro ---
     function spin() {
       if (isSpinning) return;
       isSpinning = true;
-
-      // tentar tocar som (pode ser bloqueado até interação)
-      try { audioSpin.currentTime = 0; audioSpin.play(); } catch(e){ /* ignore */ }
-
+      audioSpin.play();
       const randRotation = 3600 + Math.floor(Math.random() * 360);
       wheel.style.transform = `rotate(${randRotation}deg)`;
 
@@ -361,69 +325,43 @@
         const prize = prizes[selectedIndex];
 
         if (prize > 0) {
-          try { audioWin.currentTime = 0; audioWin.play(); } catch(e){ /* ignore */ }
+          audioWin.play();
           confetti({ particleCount: 180, spread: 90, origin: { y: 0.55 } });
-
           Swal.fire({
             title: '🎉 Parabéns!',
-            html: `
-              Você ganhou <strong>${prize} MZN</strong>!<br><br>
-              <strong>Como receber?</strong><br>
-              1️⃣ Crie sua conta na TxunaBet.<br>
-              2️⃣ Deposite pelo menos <b>10MT</b>.<br>
-              3️⃣ Receba seu prêmio imediato.
-            `,
+            html: `Você ganhou <strong>${prize} MZN</strong>!<br><br><strong>Como receber?</strong><br>1️⃣ Crie sua conta na TxunaBet.<br>2️⃣ Deposite pelo menos <b>10MT</b>.<br>3️⃣ Receba seu prêmio imediato.`,
             icon: 'success',
             confirmButtonText: 'Criar Conta Agora',
             confirmButtonColor: '#00c853',
             allowOutsideClick: false
           }).then(r => {
-            if (r.isConfirmed) {
-              // redirecionar para link de afiliado
-              window.location.href = 'https://txunaplay.com/t2975f8c2';
-            }
+            if (r.isConfirmed) window.location.href = 'https://txunaplay.com/t2975f8c2';
           });
         } else {
-          try { audioLose.currentTime = 0; audioLose.play(); } catch(e){ /* ignore */ }
-          Swal.fire({
-            title: '😢 Que pena!',
-            text: 'Não foi dessa vez. Continue tentando!',
-            icon: 'info',
-            confirmButtonText: 'OK'
-          });
+          audioLose.play();
+          Swal.fire({ title: '😢 Que pena!', text: 'Não foi dessa vez. Continue tentando!', icon: 'info', confirmButtonText: 'OK' });
         }
-
         isSpinning = false;
       }, 5200);
     }
 
-    // --- Carrossel de testemunhos ---
     let testimonialIndex = 0;
     const testimonials = document.querySelectorAll(".testimonial");
-    function showTestimonial(i) {
-      testimonials.forEach((el, idx) => {
-        el.classList.toggle("active", idx === i);
-      });
-    }
     setInterval(() => {
+      testimonials[testimonialIndex].classList.remove("active");
       testimonialIndex = (testimonialIndex + 1) % testimonials.length;
-      showTestimonial(testimonialIndex);
+      testimonials[testimonialIndex].classList.add("active");
     }, 4000);
 
-    // --- Diálogo de boas-vindas profissional (aparece no carregamento) ---
     document.addEventListener("DOMContentLoaded", () => {
-      // Garantir que o corpo esteja sempre visível se o alerta falhar
       document.body.style.opacity = '1';
-
-      // Pequeno atraso para dar sensação de entrada
       setTimeout(() => {
-        try { confetti({ particleCount: 220, spread: 110, origin: { y: 0.6 } }); } catch(e){}
-
+        confetti({ particleCount: 220, spread: 110, origin: { y: 0.6 } });
         Swal.fire({
           title: '🚀 Torne-se um Membro VIP!',
           html: `
             <div style="font-size:16px; color:#333; line-height:1.45;">
-              <p>Entre no nosso <strong style="color:${getComputedStyle(document.documentElement).getPropertyValue('--accent') || '#128C7E'};">Grupo Oficial do WhatsApp</strong><br>
+              <p>Entre no nosso <strong style="color:#128C7E;">Grupo Oficial do WhatsApp</strong><br>
               e receba <b>ofertas exclusivas, bônus diários e sorteios especiais</b>!</p>
             </div>
           `,
@@ -439,18 +377,10 @@
             center top
             no-repeat
           `,
-          allowOutsideClick: false,
-          customClass: {
-            popup: 'swal-popup',
-            title: 'swal-title',
-            confirmButton: 'swal-confirm'
-          }
+          allowOutsideClick: false
         }).then((result) => {
-          // garante que site fique visível (caso algo falhe)
           document.body.style.opacity = '1';
-
           if (result.isConfirmed) {
-            // fecha o alerta imediatamente e abre o grupo
             Swal.close();
             setTimeout(() => {
               window.open('https://whapro.pro/s/roleta', '_blank');
