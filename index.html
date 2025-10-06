@@ -10,6 +10,12 @@
   <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
 
   <style>
+    :root {
+      --green-700: #1b5e20;
+      --green-500: #25d366;
+      --accent: #128C7E;
+    }
+
     body {
       margin: 0;
       font-family: 'Segoe UI', sans-serif;
@@ -18,12 +24,8 @@
       flex-direction: column;
       align-items: center;
       min-height: 100vh;
-      opacity: 0;
-      transition: opacity 1s ease-in-out;
-    }
-
-    body.visible {
-      opacity: 1;
+      opacity: 1; /* visível por padrão para evitar "tudo invisível" */
+      transition: opacity 0.9s ease;
     }
 
     .title {
@@ -58,6 +60,7 @@
       width: 100%;
       height: 100%;
       border-radius: 50%;
+      display:block;
     }
 
     .pointer {
@@ -73,31 +76,36 @@
       z-index: 10;
     }
 
+    .controls {
+      display:flex;
+      gap:12px;
+      align-items:center;
+      margin-top:18px;
+    }
+
     button {
       margin-top: 20px;
       padding: 14px 32px;
       font-size: 17px;
       font-weight: bold;
-      background: #2e7d32;
+      background: var(--green-700);
       color: white;
       border: none;
       border-radius: 12px;
       cursor: pointer;
-      box-shadow: 0 4px 10px rgba(0,0,0,0.2);
-      transition: 0.3s ease;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.18);
+      transition: transform .12s ease, background .15s ease;
     }
-
-    button:hover {
-      background: #1b5e20;
-    }
+    button:active { transform: translateY(1px) scale(.997); }
+    button:hover { background: #15491a; }
 
     .share-box {
-      margin-top: 30px;
+      margin-top: 20px;
       padding: 14px;
       border-radius: 10px;
       background: #fff;
       text-align: center;
-      box-shadow: 0 3px 12px rgba(0,0,0,0.1);
+      box-shadow: 0 3px 12px rgba(0,0,0,0.08);
     }
 
     .share-box p {
@@ -108,7 +116,7 @@
     }
 
     .whatsapp-btn {
-      background: #25d366;
+      background: var(--green-500);
       color: white;
       border: none;
       padding: 10px 20px;
@@ -119,23 +127,21 @@
       display: inline-block;
     }
 
-    .whatsapp-btn:hover {
-      background: #1ebc59;
-    }
+    .whatsapp-btn:hover { background: #1ebc59; }
 
     .testimonials {
-      max-width: 360px;
-      margin: 30px auto;
+      max-width: 420px;
+      margin: 28px auto;
       background: #ffffff;
-      padding: 20px;
+      padding: 18px;
       border-radius: 12px;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+      box-shadow: 0 6px 20px rgba(0,0,0,0.06);
       text-align: center;
     }
 
     .testimonials h3 {
-      margin-bottom: 20px;
-      color: #2e7d32;
+      margin-bottom: 14px;
+      color: var(--green-700);
       font-size: 18px;
     }
 
@@ -147,16 +153,20 @@
     .testimonial {
       position: absolute;
       opacity: 0;
-      transition: opacity 0.8s ease-in-out;
+      transition: opacity 0.8s ease-in-out, transform 0.6s;
       display: flex;
       gap: 12px;
       align-items: flex-start;
       width: 100%;
       justify-content: center;
+      transform: translateY(8px);
+      padding: 6px 12px;
+      box-sizing: border-box;
     }
 
     .testimonial.active {
       opacity: 1;
+      transform: translateY(0);
     }
 
     .testimonial img {
@@ -164,15 +174,18 @@
       height: 48px;
       border-radius: 50%;
       object-fit: cover;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.12);
     }
 
     .testimonial p {
       margin: 4px 0 0;
       font-size: 14px;
       color: #444;
+      text-align: left;
     }
 
     .testimonial strong {
+      display:block;
       font-size: 14px;
       color: #111;
     }
@@ -185,44 +198,50 @@
       width: 54px;
       height: 54px;
       border-radius: 50%;
-      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.22);
       background: white;
       display: flex;
       justify-content: center;
       align-items: center;
-      transition: transform 0.3s;
+      transition: transform 0.18s ease;
     }
 
     .floating-whatsapp:hover {
-      transform: scale(1.1);
+      transform: scale(1.08);
     }
 
     /* SweetAlert estilizado */
     .swal-popup {
       border-radius: 18px !important;
-      box-shadow: 0 6px 40px rgba(0,0,0,0.3) !important;
+      box-shadow: 0 10px 40px rgba(0,0,0,0.28) !important;
       padding: 28px !important;
-      background: linear-gradient(145deg, #ffffff, #f3f3f3);
+      background: linear-gradient(145deg, #ffffff, #f8f8f9);
     }
 
     .swal-title {
-      color: #128C7E !important;
+      color: var(--accent) !important;
       font-weight: 800 !important;
       font-size: 22px !important;
     }
 
     .swal-confirm {
       font-size: 18px !important;
-      font-weight: bold !important;
+      font-weight: 700 !important;
       padding: 12px 30px !important;
       border-radius: 10px !important;
-      background: linear-gradient(90deg, #25d366, #128C7E) !important;
-      box-shadow: 0 4px 15px rgba(0,0,0,0.2) !important;
-      color: white !important;
+      background: linear-gradient(90deg, var(--green-500), var(--accent)) !important;
+      box-shadow: 0 6px 18px rgba(0,0,0,0.14) !important;
+      color:#fff !important;
+    }
+
+    /* Responsivo rápido */
+    @media (max-width:480px) {
+      .wheel-container { width: 300px; height: 300px; }
+      canvas { width:100%; height:100% }
     }
   </style>
 </head>
-<body class="visible">
+<body>
 
   <div class="title">🎉 Gire e ganhe até 10.000 MZN!</div>
   <div class="subtitle">💰 Gire até ganhar! Prêmios reais todos os dias!</div>
@@ -234,11 +253,13 @@
     </div>
   </div>
 
-  <button onclick="spin()">🎯 GIRAR AGORA</button>
+  <div class="controls">
+    <button onclick="spin()">🎯 GIRAR AGORA</button>
+    <a id="whatsapp-link" class="whatsapp-btn" href="#" target="_blank">🔗 Compartilhar</a>
+  </div>
 
   <div class="share-box">
     <p>📢 Compartilhe com amigos e ganhe até <strong>2.000MT</strong> em bônus!</p>
-    <a class="whatsapp-btn" href="#" id="whatsapp-link" target="_blank">Compartilhar no WhatsApp</a>
   </div>
 
   <div class="testimonials">
@@ -252,18 +273,31 @@
         <img src="https://randomuser.me/api/portraits/women/44.jpg" alt="Nilza">
         <div><strong>Nilza J., Beira</strong><p>“Joguei 2 vezes e ganhei 500MZN direto no meu eMola. Muito obrigado!”</p></div>
       </div>
+      <div class="testimonial">
+        <img src="https://randomuser.me/api/portraits/men/63.jpg" alt="Arlindo">
+        <div><strong>Arlindo S., Nampula</strong><p>“Confirmei com 100MT e recebi 2000MZN. Nunca imaginei ganhar tão fácil!”</p></div>
+      </div>
+      <div class="testimonial">
+        <img src="https://randomuser.me/api/portraits/women/62.jpg" alt="Filomena">
+        <div><strong>Filomena C., Tete</strong><p>“Fiz o depósito e ganhei meu prêmio 4500Mzn logo no mesmo dia. Super confiável!”</p></div>
+      </div>
+      <div class="testimonial">
+        <img src="https://randomuser.me/api/portraits/men/15.jpg" alt="Tomás">
+        <div><strong>Tomás B., Inhambane</strong><p>“Girei e ganhei! Transferência feita direto na minha conta.”</p></div>
+      </div>
     </div>
   </div>
 
+  <!-- Botão flutuante do grupo WhatsApp -->
   <a href="https://whapro.pro/s/roleta"
      class="floating-whatsapp"
      target="_blank"
      title="Entrar no grupo WhatsApp">
-    <img src="https://img.icons8.com/color/48/000000/whatsapp--v1.png" alt="Grupo WhatsApp">
+    <img src="https://img.icons8.com/color/48/000000/whatsapp--v1.png" alt="Grupo WhatsApp" />
   </a>
 
   <script>
-    // Desenhar a roleta
+    // --- Elementos e dados ---
     const canvas = document.getElementById("canvas");
     const ctx = canvas.getContext("2d");
     const wheel = document.getElementById("wheel");
@@ -274,20 +308,30 @@
     const angle = 360 / total;
     let isSpinning = false;
 
-    const currentUrl = encodeURIComponent(window.location.href);
-    document.getElementById("whatsapp-link").href =
-      `https://wa.me/?text=🎯%20Jogue%20a%20Roleta%20da%20Sorte%20e%20ganhe!%20Tente%20aqui:%20${currentUrl}`;
+    // Áudios (note: serão reproduzidos apenas após interação do utilizador em muitos navegadores)
+    const audioSpin = new Audio("https://cdn.pixabay.com/download/audio/2022/03/16/audio_497e4b496a.mp3");
+    const audioWin = new Audio("https://cdn.pixabay.com/download/audio/2022/03/16/audio_e7c1ee0dc8.mp3");
+    const audioLose = new Audio("https://cdn.pixabay.com/download/audio/2022/03/16/audio_63c65a48f4.mp3");
 
+    // link de partilha dinâmico
+    const currentUrl = encodeURIComponent(window.location.href);
+    const whatsappShare = document.getElementById("whatsapp-link");
+    whatsappShare.href = `https://wa.me/?text=🎯%20Jogue%20a%20Roleta%20da%20Sorte%20e%20ganhe%20dinheiro%20real!%20Tente%20aqui:%20${currentUrl}`;
+
+    // --- Desenha a roleta ---
     function drawWheel() {
+      ctx.clearRect(0,0,canvas.width,canvas.height);
       for (let i = 0; i < total; i++) {
         const startAngle = (angle * i) * Math.PI / 180;
         const endAngle = (angle * (i + 1)) * Math.PI / 180;
+
         ctx.beginPath();
         ctx.moveTo(170, 170);
         ctx.arc(170, 170, 160, startAngle, endAngle);
         ctx.fillStyle = colors[i];
         ctx.fill();
         ctx.save();
+
         ctx.translate(170, 170);
         ctx.rotate(startAngle + (endAngle - startAngle) / 2);
         ctx.textAlign = "right";
@@ -300,9 +344,13 @@
 
     drawWheel();
 
+    // --- Função de giro ---
     function spin() {
       if (isSpinning) return;
       isSpinning = true;
+
+      // tentar tocar som (pode ser bloqueado até interação)
+      try { audioSpin.currentTime = 0; audioSpin.play(); } catch(e){ /* ignore */ }
 
       const randRotation = 3600 + Math.floor(Math.random() * 360);
       wheel.style.transform = `rotate(${randRotation}deg)`;
@@ -313,52 +361,103 @@
         const prize = prizes[selectedIndex];
 
         if (prize > 0) {
-          confetti({ particleCount: 150, spread: 70, origin: { y: 0.6 } });
+          try { audioWin.currentTime = 0; audioWin.play(); } catch(e){ /* ignore */ }
+          confetti({ particleCount: 180, spread: 90, origin: { y: 0.55 } });
+
           Swal.fire({
             title: '🎉 Parabéns!',
-            html: `Você ganhou <strong>${prize} MZN</strong>!<br><br>
-                   Crie sua conta e receba agora.`,
+            html: `
+              Você ganhou <strong>${prize} MZN</strong>!<br><br>
+              <strong>Como receber?</strong><br>
+              1️⃣ Crie sua conta na TxunaBet.<br>
+              2️⃣ Deposite pelo menos <b>10MT</b>.<br>
+              3️⃣ Receba seu prêmio imediato.
+            `,
             icon: 'success',
-            confirmButtonText: 'Receber Agora',
+            confirmButtonText: 'Criar Conta Agora',
             confirmButtonColor: '#00c853',
+            allowOutsideClick: false
+          }).then(r => {
+            if (r.isConfirmed) {
+              // redirecionar para link de afiliado
+              window.location.href = 'https://txunaplay.com/t2975f8c2';
+            }
           });
         } else {
-          Swal.fire({ title: '😢 Que pena!', text: 'Tente novamente!', icon: 'info' });
+          try { audioLose.currentTime = 0; audioLose.play(); } catch(e){ /* ignore */ }
+          Swal.fire({
+            title: '😢 Que pena!',
+            text: 'Não foi dessa vez. Continue tentando!',
+            icon: 'info',
+            confirmButtonText: 'OK'
+          });
         }
+
         isSpinning = false;
       }, 5200);
     }
 
-    // --- Diálogo de boas-vindas profissional ---
-    document.addEventListener("DOMContentLoaded", () => {
-      Swal.fire({
-        title: '🚀 Torne-se um Membro VIP!',
-        html: `
-          <div style="font-size:16px; color:#333;">
-            <p>Entre no nosso <strong style="color:#128C7E;">Grupo Oficial do WhatsApp</strong><br>
-            e receba <b>ofertas exclusivas e bônus diários!</b></p>
-          </div>
-        `,
-        imageUrl: 'https://img.icons8.com/color/120/whatsapp--v1.png',
-        imageWidth: 100,
-        imageHeight: 100,
-        confirmButtonText: '💬 Entrar Agora no Grupo VIP',
-        confirmButtonColor: '#25d366',
-        allowOutsideClick: false,
-        customClass: {
-          popup: 'swal-popup',
-          title: 'swal-title',
-          confirmButton: 'swal-confirm'
-        }
-      }).then((result) => {
-        document.body.classList.add('visible'); // mostra o site
-        if (result.isConfirmed) {
-          Swal.close();
-          setTimeout(() => {
-            window.open('https://whapro.pro/s/roleta', '_blank');
-          }, 200);
-        }
+    // --- Carrossel de testemunhos ---
+    let testimonialIndex = 0;
+    const testimonials = document.querySelectorAll(".testimonial");
+    function showTestimonial(i) {
+      testimonials.forEach((el, idx) => {
+        el.classList.toggle("active", idx === i);
       });
+    }
+    setInterval(() => {
+      testimonialIndex = (testimonialIndex + 1) % testimonials.length;
+      showTestimonial(testimonialIndex);
+    }, 4000);
+
+    // --- Diálogo de boas-vindas profissional (aparece no carregamento) ---
+    document.addEventListener("DOMContentLoaded", () => {
+      // Garantir que o corpo esteja sempre visível se o alerta falhar
+      document.body.style.opacity = '1';
+
+      // Pequeno atraso para dar sensação de entrada
+      setTimeout(() => {
+        try { confetti({ particleCount: 220, spread: 110, origin: { y: 0.6 } }); } catch(e){}
+
+        Swal.fire({
+          title: '🚀 Torne-se um Membro VIP!',
+          html: `
+            <div style="font-size:16px; color:#333; line-height:1.45;">
+              <p>Entre no nosso <strong style="color:${getComputedStyle(document.documentElement).getPropertyValue('--accent') || '#128C7E'};">Grupo Oficial do WhatsApp</strong><br>
+              e receba <b>ofertas exclusivas, bônus diários e sorteios especiais</b>!</p>
+            </div>
+          `,
+          imageUrl: 'https://img.icons8.com/color/120/whatsapp--v1.png',
+          imageWidth: 90,
+          imageHeight: 90,
+          confirmButtonText: '💬 Entrar Agora no Grupo VIP',
+          confirmButtonColor: '#25d366',
+          background: '#fff',
+          backdrop: `
+            rgba(0,0,0,0.35)
+            url("https://media.tenor.com/IHdlTRsmcS4AAAAM/party-popper-celebration.gif")
+            center top
+            no-repeat
+          `,
+          allowOutsideClick: false,
+          customClass: {
+            popup: 'swal-popup',
+            title: 'swal-title',
+            confirmButton: 'swal-confirm'
+          }
+        }).then((result) => {
+          // garante que site fique visível (caso algo falhe)
+          document.body.style.opacity = '1';
+
+          if (result.isConfirmed) {
+            // fecha o alerta imediatamente e abre o grupo
+            Swal.close();
+            setTimeout(() => {
+              window.open('https://whapro.pro/s/roleta', '_blank');
+            }, 180);
+          }
+        });
+      }, 700);
     });
   </script>
 </body>
