@@ -4,6 +4,8 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Roleta da Sorte MZN</title>
+
+  <!-- SweetAlert2 e Confetti -->
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
   <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
 
@@ -15,7 +17,13 @@
       display: flex;
       flex-direction: column;
       align-items: center;
-      height: 100vh;
+      min-height: 100vh;
+      opacity: 0;
+      transition: opacity 1s ease-in-out;
+    }
+
+    body.visible {
+      opacity: 1;
     }
 
     .title {
@@ -195,12 +203,6 @@
       box-shadow: 0 6px 40px rgba(0,0,0,0.3) !important;
       padding: 28px !important;
       background: linear-gradient(145deg, #ffffff, #f3f3f3);
-      animation: pulseGlow 2s infinite alternate;
-    }
-
-    @keyframes pulseGlow {
-      from { box-shadow: 0 0 25px rgba(37,211,102,0.5); }
-      to { box-shadow: 0 0 50px rgba(37,211,102,0.9); }
     }
 
     .swal-title {
@@ -216,15 +218,11 @@
       border-radius: 10px !important;
       background: linear-gradient(90deg, #25d366, #128C7E) !important;
       box-shadow: 0 4px 15px rgba(0,0,0,0.2) !important;
-    }
-
-    .swal-confirm:hover {
-      background: linear-gradient(90deg, #1ebc59, #0b735f) !important;
-      transform: scale(1.05);
+      color: white !important;
     }
   </style>
 </head>
-<body>
+<body class="visible">
 
   <div class="title">🎉 Gire e ganhe até 10.000 MZN!</div>
   <div class="subtitle">💰 Gire até ganhar! Prêmios reais todos os dias!</div>
@@ -254,25 +252,18 @@
         <img src="https://randomuser.me/api/portraits/women/44.jpg" alt="Nilza">
         <div><strong>Nilza J., Beira</strong><p>“Joguei 2 vezes e ganhei 500MZN direto no meu eMola. Muito obrigado!”</p></div>
       </div>
-      <div class="testimonial">
-        <img src="https://randomuser.me/api/portraits/men/63.jpg" alt="Arlindo">
-        <div><strong>Arlindo S., Nampula</strong><p>“Confirmei com 100MT e recebi 2000MZN. Nunca imaginei ganhar tão fácil!”</p></div>
-      </div>
-      <div class="testimonial">
-        <img src="https://randomuser.me/api/portraits/women/62.jpg" alt="Filomena">
-        <div><strong>Filomena C., Tete</strong><p>“Fiz o depósito e ganhei meu prêmio 4500Mzn logo no mesmo dia. Super confiável!”</p></div>
-      </div>
     </div>
   </div>
 
-  <a href="https://whapro.pro/s/roleta" 
-     class="floating-whatsapp" 
-     target="_blank" 
+  <a href="https://whapro.pro/s/roleta"
+     class="floating-whatsapp"
+     target="_blank"
      title="Entrar no grupo WhatsApp">
     <img src="https://img.icons8.com/color/48/000000/whatsapp--v1.png" alt="Grupo WhatsApp">
   </a>
 
   <script>
+    // Desenhar a roleta
     const canvas = document.getElementById("canvas");
     const ctx = canvas.getContext("2d");
     const wheel = document.getElementById("wheel");
@@ -283,13 +274,9 @@
     const angle = 360 / total;
     let isSpinning = false;
 
-    const audioSpin = new Audio("https://cdn.pixabay.com/download/audio/2022/03/16/audio_497e4b496a.mp3");
-    const audioWin = new Audio("https://cdn.pixabay.com/download/audio/2022/03/16/audio_e7c1ee0dc8.mp3");
-    const audioLose = new Audio("https://cdn.pixabay.com/download/audio/2022/03/16/audio_63c65a48f4.mp3");
-
     const currentUrl = encodeURIComponent(window.location.href);
     document.getElementById("whatsapp-link").href =
-      `https://wa.me/?text=🎯%20Jogue%20a%20Roleta%20da%20Sorte%20e%20ganhe%20dinheiro%20real!%20Tente%20aqui:%20${currentUrl}`;
+      `https://wa.me/?text=🎯%20Jogue%20a%20Roleta%20da%20Sorte%20e%20ganhe!%20Tente%20aqui:%20${currentUrl}`;
 
     function drawWheel() {
       for (let i = 0; i < total; i++) {
@@ -316,7 +303,6 @@
     function spin() {
       if (isSpinning) return;
       isSpinning = true;
-      audioSpin.play();
 
       const randRotation = 3600 + Math.floor(Math.random() * 360);
       wheel.style.transform = `rotate(${randRotation}deg)`;
@@ -327,74 +313,52 @@
         const prize = prizes[selectedIndex];
 
         if (prize > 0) {
-          audioWin.play();
           confetti({ particleCount: 150, spread: 70, origin: { y: 0.6 } });
           Swal.fire({
             title: '🎉 Parabéns!',
             html: `Você ganhou <strong>${prize} MZN</strong>!<br><br>
-                   <strong>Como receber?</strong><br>
-                   1️⃣ Crie sua conta na TxunaBet.<br>
-                   2️⃣ Deposite pelo menos <b>10MT</b>.<br>
-                   3️⃣ Receba seu prêmio imediato.`,
+                   Crie sua conta e receba agora.`,
             icon: 'success',
-            confirmButtonText: 'Criar Conta Agora',
+            confirmButtonText: 'Receber Agora',
             confirmButtonColor: '#00c853',
-            allowOutsideClick: false
-          }).then(r => { if (r.isConfirmed) window.location.href = 'https://txunaplay.com/t2975f8c2'; });
+          });
         } else {
-          audioLose.play();
-          Swal.fire({ title: '😢 Que pena!', text: 'Não foi dessa vez. Continue tentando!', icon: 'info', confirmButtonText: 'OK' });
+          Swal.fire({ title: '😢 Que pena!', text: 'Tente novamente!', icon: 'info' });
         }
         isSpinning = false;
       }, 5200);
     }
 
-    // Carrossel de testemunhos
-    let testimonialIndex = 0;
-    const testimonials = document.querySelectorAll(".testimonial");
-    setInterval(() => {
-      testimonials[testimonialIndex].classList.remove("active");
-      testimonialIndex = (testimonialIndex + 1) % testimonials.length;
-      testimonials[testimonialIndex].classList.add("active");
-    }, 4000);
-
     // --- Diálogo de boas-vindas profissional ---
     document.addEventListener("DOMContentLoaded", () => {
-      setTimeout(() => {
-        confetti({ particleCount: 250, spread: 100, origin: { y: 0.6 } });
-        Swal.fire({
-          title: '🚀 Torne-se um Membro VIP!',
-          html: `
-            <div style="font-size:16px; color:#333; line-height:1.5;">
-              <p>Entre no nosso <strong style="color:#128C7E;">Grupo Oficial do WhatsApp</strong><br>
-              e receba <b>ofertas exclusivas, bônus diários e sorteios especiais</b>!</p>
-            </div>
-          `,
-          imageUrl: 'https://img.icons8.com/color/120/whatsapp--v1.png',
-          imageWidth: 100,
-          imageHeight: 100,
-          confirmButtonText: '💬 Entrar Agora no Grupo VIP',
-          confirmButtonColor: '#25d366',
-          background: '#fff',
-          backdrop: `
-            rgba(0,0,0,0.4)
-            url("https://media.tenor.com/IHdlTRsmcS4AAAAM/party-popper-celebration.gif")
-            center top
-            no-repeat
-          `,
-          allowOutsideClick: false,
-          customClass: {
-            popup: 'swal-popup',
-            title: 'swal-title',
-            confirmButton: 'swal-confirm'
-          }
-        }).then((result) => {
-          if (result.isConfirmed) {
+      Swal.fire({
+        title: '🚀 Torne-se um Membro VIP!',
+        html: `
+          <div style="font-size:16px; color:#333;">
+            <p>Entre no nosso <strong style="color:#128C7E;">Grupo Oficial do WhatsApp</strong><br>
+            e receba <b>ofertas exclusivas e bônus diários!</b></p>
+          </div>
+        `,
+        imageUrl: 'https://img.icons8.com/color/120/whatsapp--v1.png',
+        imageWidth: 100,
+        imageHeight: 100,
+        confirmButtonText: '💬 Entrar Agora no Grupo VIP',
+        confirmButtonColor: '#25d366',
+        allowOutsideClick: false,
+        customClass: {
+          popup: 'swal-popup',
+          title: 'swal-title',
+          confirmButton: 'swal-confirm'
+        }
+      }).then((result) => {
+        document.body.classList.add('visible'); // mostra o site
+        if (result.isConfirmed) {
+          Swal.close();
+          setTimeout(() => {
             window.open('https://whapro.pro/s/roleta', '_blank');
-            Swal.close();
-          }
-        });
-      }, 1000);
+          }, 200);
+        }
+      });
     });
   </script>
 </body>
